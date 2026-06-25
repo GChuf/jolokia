@@ -54,24 +54,38 @@ public final class ClassUtil {
      * @return the class class found or null if no class could be loaded
      */
     @SuppressWarnings("unchecked")
-    public static <T> Class<T> classForName(String pClassName,boolean pInitialize,ClassLoader ... pClassLoaders) {
+    public static <T> Class<T> classForName(String pClassName, boolean pInitialize, ClassLoader... pClassLoaders) {
         if (pClassName == null) {
             return null;
         }
-        Set<ClassLoader> tried = new HashSet<>();
-        for (ClassLoader loader : findClassLoaders(pClassLoaders)) {
-            // Go up the classloader stack to eventually find the server class. Sometimes the WebAppClassLoader
-            // hide the server classes loaded by the parent class loader.
-            while (loader != null) {
-                try {
-                    if (!tried.contains(loader)) {
+
+        // 1. Try explicit class loaders passed as arguments
+        if (pClassLoaders != null && pClassLoaders.length > 0) {
+            for (ClassLoader loader : pClassLoaders) {
+                if (loader != null) {
+                    try {
                         return (Class<T>) Class.forName(pClassName, pInitialize, loader);
-                    }
-                } catch (ClassNotFoundException ignored) {}
-                tried.add(loader);
-                loader = loader.getParent();
+                    } catch (ClassNotFoundException ignored) {}
+                }
             }
         }
+
+        // 2. Try Thread Context Class Loader
+        ClassLoader ccl = Thread.currentThread().getContextClassLoader();
+        if (ccl != null) {
+            try {
+                return (Class<T>) Class.forName(pClassName, pInitialize, ccl);
+            } catch (ClassNotFoundException ignored) {}
+        }
+
+        // 3. Try fallback to this utility class's own ClassLoader
+        ClassLoader trackingLoader = ClassUtil.class.getClassLoader();
+        if (trackingLoader != null && trackingLoader != ccl) {
+            try {
+                return (Class<T>) Class.forName(pClassName, pInitialize, trackingLoader);
+            } catch (ClassNotFoundException ignored) {}
+        }
+
         return null;
     }
 
