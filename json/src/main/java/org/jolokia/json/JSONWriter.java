@@ -36,7 +36,7 @@ public class JSONWriter {
         writer.write('{');
         int pos = map.size() - 1;
         for (Map.Entry<String, Object> el : map.entrySet()) {
-            escape(writer, el.getKey().toCharArray());
+            escape(writer, el.getKey());
             writer.write(':');
             serialize(el.getValue(), writer);
             if (pos-- > 0) {
@@ -111,9 +111,9 @@ public class JSONWriter {
             // includes BigDecimals and BigIntegers
             writer.write(value.toString());
         } else if (value instanceof Character) {
-            escape(writer, new char[] { (char) value });
+            escape(writer, (char) value );
         } else if (value instanceof String) {
-            escape(writer, ((String) value).toCharArray());
+            escape(writer, (String) value);
         } else if (value instanceof Collection<?> collection) {
             serialize(collection, writer);
         } else if (value instanceof JSONObject) {
@@ -142,7 +142,7 @@ public class JSONWriter {
      * @param writer
      * @throws IOException
      */
-    private static void escape(Writer writer, char[] characters) throws IOException {
+    private static void escape0(Writer writer, char[] characters) throws IOException {
         // https://datatracker.ietf.org/doc/html/rfc8259#section-7
         //     All Unicode characters may be placed within the
         //     quotation marks, except for the characters that MUST be escaped:
@@ -206,6 +206,65 @@ public class JSONWriter {
         buffer.append('"');
 
         writer.write(buffer.toString());
+    }
+    
+    // 2. Optimized Single Character Escape
+    private static void escape(Writer writer, char c) throws IOException {
+    writer.write('"');
+    if (c > 0x1F && c != '"' && c != '\\') {
+        writer.write(c);
+    } else {
+        writeEscape(writer, c);
+    }
+    writer.write('"');
+}
+
+    // 1. Optimized String Escape (Zero-Allocation)
+    private static void escape(Writer writer, String str) throws IOException {
+        writer.write('"');
+        
+        int length = str.length();
+        int runStart = 0;
+
+        for (int i = 0; i < length; i++) {
+            char c = str.charAt(i);
+            
+            if (c > 0x1F && c != '"' && c != '\\') {
+                continue;
+            }
+
+            if (i > runStart) {
+                // Writes directly out of the String's internal storage
+                writer.write(str, runStart, i - runStart);
+            }
+
+            writeEscape(writer, c);
+            runStart = i + 1;
+        }
+
+        if (runStart < length) {
+            writer.write(str, runStart, length - runStart);
+        }
+
+        writer.write('"');
+    }
+
+    private static final char[] HEX_CHARS = "0123456789abcdef".toCharArray();
+    private static void writeEscape(Writer writer, char c) throws IOException {
+        switch (c) {
+            case '"':  writer.write("\\\""); break;
+            case '\\': writer.write("\\\\"); break;
+            case '\b': writer.write("\\b"); break;
+            case '\f': writer.write("\\f"); break;
+            case '\n': writer.write("\\n"); break;
+            case '\r': writer.write("\\r"); break;
+            case '\t': writer.write("\\t"); break;
+            default:
+                writer.write("\\u00");
+                writer.write(HEX_CHARS[(c >>> 4) & 0X0F]);
+                writer.write(HEX_CHARS[c & 0X0F]);
+                break;
+        }
     }
 
 }
