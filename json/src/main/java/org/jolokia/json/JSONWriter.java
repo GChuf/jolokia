@@ -93,31 +93,32 @@ public class JSONWriter {
     public static void serialize(Object value, Writer writer) throws IOException {
         if (value == null) {
             writer.write("null");
-        } else if (value instanceof Boolean) {
-            writer.write((boolean) value ? "true" : "false");
-        } else if (value instanceof Float) {
-            if (Float.isFinite((float) value)) {
-                writer.write(value.toString());
+        } else if (value instanceof Boolean b) {
+            writer.write(b ? "true" : "false");
+        } else if (value instanceof Number num) {
+            if (num instanceof Double d) {
+                if (Double.isFinite(d)) {
+                    writer.write(d.toString());
+                } else {
+                    writer.write("null");
+                }
+            } else if (num instanceof Float f) {
+                if (Float.isFinite(f)) {
+                    writer.write(f.toString());
+                } else {
+                    writer.write("null");
+                }
             } else {
-                writer.write("null");
+                writer.write(num.toString());
             }
-        } else if (value instanceof Double) {
-            if (Double.isFinite((double) value)) {
-                writer.write(value.toString());
-            } else {
-                writer.write("null");
-            }
-        } else if (value instanceof Number) {
-            // includes BigDecimals and BigIntegers
-            writer.write(value.toString());
-        } else if (value instanceof Character) {
-            escape(writer, (char) value );
-        } else if (value instanceof String) {
-            escape(writer, (String) value);
+        } else if (value instanceof Character c) {
+            escape(writer, c);
+        } else if (value instanceof String s) {
+            escape(writer, s);
         } else if (value instanceof Collection<?> collection) {
             serialize(collection, writer);
-        } else if (value instanceof JSONObject) {
-            serialize((JSONObject) value, writer);
+        } else if (value instanceof JSONObject j) {
+            serialize(j, writer);
         } else if (value instanceof Map<?, ?> map) {
             // not sure about the key types, so be extra careful
             serializeAnyMap(map, writer);
