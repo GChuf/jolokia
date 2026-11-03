@@ -324,7 +324,7 @@ public class JolokiaHttpHandler implements HttpHandler {
             }
         }
         InputStream is = pExchange.getRequestBody();
-        return requestHandler.handlePostRequest(pUri.toString(), is, encoding, pUri.getParameterMap());
+        return requestHandler.handlePostRequest(pUri, is, encoding);
     }
 
     /**

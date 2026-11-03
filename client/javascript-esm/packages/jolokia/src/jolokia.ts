@@ -568,20 +568,20 @@ function prepareRequest(request: JolokiaRequest | JolokiaRequest[], agentOptions
       fetchOptions.redirect = overrides.redirect
     }
   }
-  fetchOptions.headers = {}
+
 
   const method = extractMethod(request, opts)
   let url = ensureTrailingSlash(opts.url!)
 
-  if (opts.headers) {
-    // If user has specified `headers` option, these are copied here. Some headers
-    // (Content-Type and Authorization) may be overridden below
-    Object.assign(fetchOptions.headers, opts.headers)
-  }
+
+  // If user has specified `headers` option, these are copied here. Some headers
+  // (Content-Type and Authorization) may be overridden below.
+  // If not, an empty object is set
+  fetchOptions.headers = { ...(opts.headers as Record<string, string>) };
 
   if (method === "post") {
     fetchOptions.method = "POST"
-    Object.assign(fetchOptions.headers, { "Content-Type": "application/json" })
+    fetchOptions.headers["Content-Type"] = "application/json"
   } else {
     fetchOptions.method = "GET"
     // request can't be an array

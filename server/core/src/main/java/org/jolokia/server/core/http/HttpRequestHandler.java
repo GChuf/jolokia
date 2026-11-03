@@ -31,6 +31,8 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.jolokia.jvmagent.ParsedUri;
+
 import org.jolokia.json.JSONArray;
 import org.jolokia.json.JSONObject;
 import org.jolokia.json.JSONStructure;
@@ -117,12 +119,13 @@ public class HttpRequestHandler extends BaseRequestHandler {
      * @throws BadRequestException if there's a parsing error or parameter processing error (always sender's fault)
      * @throws EmptyResponseException if the connection should not be closed (only for notifications)
      */
-    public JSONStructure handlePostRequest(String pUri, InputStream pInputStream, String pEncoding, Map<String, String[]> pParameterMap)
+    public JSONStructure handlePostRequest(ParsedUri pUri, InputStream pInputStream, String pEncoding)
             throws IOException, BadRequestException, EmptyResponseException {
         if (jolokiaCtx.isDebug()) {
-            jolokiaCtx.debug("URI: " + pUri);
+            jolokiaCtx.debug("URI: " + pUri.toString());
         }
 
+        Map<String, String[]> pParameterMap = pUri.getParameterMap();
         ProcessingParameters parameters = getProcessingParameter(pParameterMap);
         Object jsonRequest = extractJsonRequest(pInputStream, pEncoding);
         if (jsonRequest instanceof JSONArray) {
