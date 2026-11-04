@@ -38,6 +38,9 @@ import java.math.BigInteger;
 %unicode
 
 %class Yylex
+// initial size of the read buffer, which grows when needed. The default (16K chars) is allocated for each
+// parsed document, which is much more than a typical Jolokia request needs
+%buffer 1024
 %ctorarg int capacity
 %init{
   this.sb = new StringBuilder(capacity);

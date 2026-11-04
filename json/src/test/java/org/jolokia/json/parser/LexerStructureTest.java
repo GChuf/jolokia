@@ -111,7 +111,7 @@ public class LexerStructureTest {
 
     @Test
     public void hugeToken() throws IOException, ParseException {
-        // the lexer uses ZZ_BUFFERSIZE = 16384 for lookahead buffer
+        // the lexer starts with ZZ_BUFFERSIZE = 1024 for lookahead buffer, which grows to fit the token
         String sb = '\"' +
             // 64MiB
             "0123456789".repeat(128 * 65_536) +
