@@ -1126,6 +1126,12 @@
         <version>${version.org.apache.logging.log4j}</version>
       </dependency>
 
+      <dependency>
+        <groupId>org.openjdk.jmh</groupId>
+        <artifactId>jmh-core</artifactId>
+        <version>${version.org.openjdk.jmh}</version>
+      </dependency>
+
     </dependencies>
   </dependencyManagement>
 
@@ -1215,6 +1221,7 @@
     <version.org.eclipse.jetty>12.1.14</version.org.eclipse.jetty>
     <version.org.ops4j.pax.exam>4.14.0</version.org.ops4j.pax.exam>
     <version.org.ops4j.pax.logging>2.3.5</version.org.ops4j.pax.logging>
+    <version.org.openjdk.jmh>1.37</version.org.openjdk.jmh>
     <version.org.ops4j.pax.web>11.1.0</version.org.ops4j.pax.web>
     <version.org.testng>7.12.0</version.org.testng>
     <version.org.wiremock>3.13.2</version.org.wiremock>
@@ -1565,6 +1572,14 @@
         <module>examples/spring6</module>
         <module>examples/springboot3</module>
         <module>examples/springboot3-actuator</module>
+      </modules>
+    </profile>
+
+    <profile>
+      <!-- JMH benchmarks, see tools/benchmarks/README.md -->
+      <id>benchmarks</id>
+      <modules>
+        <module>tools/benchmarks</module>
       </modules>
     </profile>
 
