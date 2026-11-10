@@ -115,7 +115,7 @@ public abstract class SimplifierAccessor<T> implements ObjectAccessor {
             throws AttributeNotFoundException {
         JSONObject ret = new JSONObject();
         for (Map.Entry<String, AttributeExtractor<T>> entry : extractors.entrySet()) {
-            Deque<String> paths = new LinkedList<>(pPath);
+            Deque<String> paths = pPath.isEmpty() ? pPath : new LinkedList<>(pPath);
             try {
                 // extract single attribute using registered attribute extractor
                 Object value = entry.getValue().extract(pValue);

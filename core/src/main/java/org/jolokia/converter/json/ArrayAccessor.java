@@ -117,8 +117,8 @@ public class ArrayAccessor implements org.jolokia.converter.json.ObjectAccessor 
             throws AttributeNotFoundException {
         JSONArray ret = new JSONArray(pLength);
         for (int i = 0; i < pLength; i++) {
-            // a copy passed (and drained) for each element
-            Deque<String> path = new LinkedList<>(pPath);
+            // a copy passed (and drained) for each element; an empty path is never modified, so it is shared
+            Deque<String> path = pPath.isEmpty() ? pPath : new LinkedList<>(pPath);
             try {
                 Object obj = Array.get(pArray, i);
                 ret.add(pConverter.extractObject(obj, path, true));

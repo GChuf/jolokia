@@ -131,7 +131,7 @@ public class MapAccessor implements org.jolokia.converter.json.ObjectAccessor {
         JSONObject ret = new JSONObject();
         int i = 0;
         for (Map.Entry<?, ?> entry : pMap.entrySet()) {
-            Deque<String> paths = new LinkedList<>(pPath);
+            Deque<String> paths = pPath.isEmpty() ? pPath : new LinkedList<>(pPath);
             try {
                 // we need to convert the key to a String in a better way than .toString()
                 //  - key is explicitly converted into String, skipping the "extraction", because we don't

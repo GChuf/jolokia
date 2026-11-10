@@ -130,8 +130,8 @@ public class ListAccessor implements org.jolokia.converter.json.ObjectAccessor {
         int idx = 0;
         for (Iterator<?> it = pList.iterator(); it.hasNext() && idx < pLength; idx++ ) {
             Object item = it.next();
-            // a copy passed (and drained) for each element
-            Deque<String> path = new LinkedList<>(pPath);
+            // a copy passed (and drained) for each element; an empty path is never modified, so it is shared
+            Deque<String> path = pPath.isEmpty() ? pPath : new LinkedList<>(pPath);
             try {
                 ret.add(pConverter.extractObject(item, path, true));
             } catch (ValueFaultHandler.AttributeFilteredException exp) {

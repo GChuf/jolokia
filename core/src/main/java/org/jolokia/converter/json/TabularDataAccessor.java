@@ -226,7 +226,7 @@ public class TabularDataAccessor implements org.jolokia.converter.json.ObjectAcc
         JSONObject ret = new JSONObject();
         for (Object rowObject : pTabularData.values()) {
             CompositeData row = (CompositeData) rowObject;
-            Deque<String> path = new LinkedList<>(pPath);
+            Deque<String> path = pPath.isEmpty() ? pPath : new LinkedList<>(pPath);
             Object keyObject = row.get("key");
             if (keyObject != null) {
                 try {
@@ -335,7 +335,7 @@ public class TabularDataAccessor implements org.jolokia.converter.json.ObjectAcc
 
         boolean found = false;
         for (CompositeData tableRow : (Collection<CompositeData>) pTabularData.values()) {
-            Deque<String> path = new LinkedList<>(pPath);
+            Deque<String> path = pPath.isEmpty() ? pPath : new LinkedList<>(pPath);
             try {
                 JSONObject targetJSONObject = ret;
                 // each index nests the actual map representation of the row

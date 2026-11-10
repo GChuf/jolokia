@@ -79,7 +79,7 @@ public class CompositeDataAccessor implements org.jolokia.converter.json.ObjectA
             throws AttributeNotFoundException {
         JSONObject ret = new JSONObject();
         for (String key : pData.getCompositeType().keySet()) {
-            Deque<String> paths = new LinkedList<>(pPath);
+            Deque<String> paths = pPath.isEmpty() ? pPath : new LinkedList<>(pPath);
             try {
                 // fortunately key is always a String
                 ret.put(key, pConverter.extractObject(pData.get(key), paths, true));

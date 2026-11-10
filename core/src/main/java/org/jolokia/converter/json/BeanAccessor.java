@@ -289,7 +289,7 @@ public class BeanAccessor implements org.jolokia.converter.json.ObjectAccessor {
             throws AttributeNotFoundException {
         Map<String, Object> ret = new JSONObject();
         for (AttributeAndMethod attribute : pAttributes) {
-            Deque<String> path = new LinkedList<>(pPathParts);
+            Deque<String> path = pPathParts.isEmpty() ? pPathParts : new LinkedList<>(pPathParts);
             try {
                 ret.put(attribute.name, extractBeanPropertyValueAsJSON(pConverter, pValue, attribute, path));
             } catch (ValueFaultHandler.AttributeFilteredException exp) {
