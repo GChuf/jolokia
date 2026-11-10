@@ -272,6 +272,21 @@ public class ObjectToObjectConverterTest {
         assertSame(converter.convert("java.util.Map", map), map);
     }
 
+    @Test
+    public void prepareValueJavaLangTypes() {
+        assertEquals("text", converter.convert("java.lang.String", "text"));
+        // special string tags are still converted
+        assertNull(converter.convert("java.lang.String", "[null]"));
+        assertEquals(Boolean.TRUE, converter.convert("java.lang.Boolean", "true"));
+        assertEquals('c', converter.convert("java.lang.Character", "c"));
+        assertEquals((byte) 1, converter.convert("java.lang.Byte", "1"));
+        assertEquals((short) 2, converter.convert("java.lang.Short", "2"));
+        assertEquals(3, converter.convert("java.lang.Integer", "3"));
+        assertEquals(4L, converter.convert("java.lang.Long", "4"));
+        assertEquals(5.5f, converter.convert("java.lang.Float", "5.5"));
+        assertEquals(6.5d, converter.convert("java.lang.Double", "6.5"));
+    }
+
     @Test(expectedExceptions = { IllegalArgumentException.class })
     public void prepareValueInvalidClass() {
         converter.convert("blubber.bla.hello", 10L);

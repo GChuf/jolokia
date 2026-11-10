@@ -65,6 +65,9 @@ public class ObjectToObjectConverter implements Converter<String> {
     private static final Map<String, Class<?>> TYPE_SIGNATURE_MAP = new HashMap<>();
     private static final Map<String, Class<?>> PRIMITIVE_TYPE_MAP = new HashMap<>();
     private static final Map<String, Class<?>> PRIMITIVE_TYPES = new HashMap<>();
+    // frequently requested java.lang classes, which are the same for every class loader. Looking them up here
+    // avoids a ClassUtil.classForName() call for e.g. every map key converted to a String during serialization
+    private static final Map<String, Class<?>> JAVA_LANG_TYPES = new HashMap<>();
     private static final Map<String, Parser> PARSER_MAP = new HashMap<>();
 
     // String parser is special, because it can be configured with discovered simplifiers
@@ -109,6 +112,11 @@ public class ObjectToObjectConverter implements Converter<String> {
         PRIMITIVE_TYPE_MAP.put(long.class.getName(), Long.class);
         PRIMITIVE_TYPE_MAP.put(float.class.getName(), Float.class);
         PRIMITIVE_TYPE_MAP.put(double.class.getName(), Double.class);
+
+        for (Class<?> cls : new Class<?>[] { String.class, Boolean.class, Character.class, Byte.class,
+                Short.class, Integer.class, Long.class, Float.class, Double.class }) {
+            JAVA_LANG_TYPES.put(cls.getName(), cls);
+        }
 
         // parsers of all "basic" types - not 1:1 with types defined in JMX 1.4 specification
         // "3.2 - Basic Data Types", Table 1 for Open MBeans basic data types
@@ -244,6 +252,8 @@ public class ObjectToObjectConverter implements Converter<String> {
             expectedClass = TYPE_SIGNATURE_MAP.get(pExpectedClassName);
         } else if (PRIMITIVE_TYPE_MAP.containsKey(pExpectedClassName)) {
             expectedClass = PRIMITIVE_TYPE_MAP.get(pExpectedClassName);
+        } else if (JAVA_LANG_TYPES.containsKey(pExpectedClassName)) {
+            expectedClass = JAVA_LANG_TYPES.get(pExpectedClassName);
         } else {
             expectedClass = ClassUtil.classForName(pExpectedClassName);
         }
